@@ -4,10 +4,10 @@
 
 #![no_std]
 
-extern crate f0;
+extern crate stm32f03x_hal;
 
-use f0::exceptions::{self, Exceptions};
-use f0::interrupts::{self, Interrupts};
+use stm32f03x_hal::exceptions::{self, Exceptions};
+use stm32f03x_hal::interrupts::{self, Interrupts};
 
 fn main() {
     panic!()

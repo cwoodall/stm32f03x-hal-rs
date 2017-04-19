@@ -150,14 +150,14 @@ in [`examples/app.rs`](examples/app.rs):
 #![no_std]
 
 // We have to link our crate, obviously
-extern crate f0;
+extern crate stm32f03x_hal;
 
 // Instead of `std` we use the `core` crate, which provides the subset of
 // `std`'s functionality that works on bare metal environments
 use core::u32;
 
-use f0::exceptions::{self, Exceptions};
-use f0::interrupts::{self, Interrupts};
+use stm32f03x_hal::exceptions::{self, Exceptions};
+use stm32f03x_hal::interrupts::{self, Interrupts};
 
 // We need a `main` function, just like every other Rust program
 fn main() {
