@@ -1,3 +1,5 @@
+use cortex_m::asm;
+
 /// Default panic handler
 #[linkage = "weak"]
 #[lang = "panic_fmt"]
@@ -16,7 +18,7 @@ unsafe extern "C" fn panic_fmt(_args: ::core::fmt::Arguments,
     }
     hprintln!("', {}:{}", _file, _line);
 
-    bkpt!();
+    asm::bkpt();
 
     loop {}
 }
@@ -40,10 +42,7 @@ unsafe extern "C" fn panic_fmt(_args: ::core::fmt::Arguments,
 // has to call `rustc_main`. That's covered by the `reset_handler` function in
 // `src/exceptions.rs`
 #[lang = "start"]
-extern "C" fn start(main: fn(),
-                    _argc: isize,
-                    _argv: *const *const u8)
-                    -> isize {
+extern "C" fn start(main: fn(), _argc: isize, _argv: *const *const u8) -> isize {
     main();
 
     0

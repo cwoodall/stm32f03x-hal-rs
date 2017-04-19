@@ -1,10 +1,12 @@
 //! How to override an exception handler
 
-#![feature(asm)]  // for `bkpt!`
+#![feature(asm)] // for `bkpt!`
 #![no_std]
 
-#[macro_use]  // for `bkpt!`
+#[macro_use] // for `bkpt!`
 extern crate stm32f03x_hal;
+
+use stm32f0xx::asm;
 
 use core::ptr;
 
@@ -28,9 +30,8 @@ pub static _EXCEPTIONS: Exceptions = Exceptions {
 
 unsafe extern "C" fn custom_handler() {
     // Once you hit the exception in `main`, you should reach this point!
-    bkpt!();
+    asm::bkpt();
 }
 
 #[no_mangle]
-pub static _INTERRUPTS: Interrupts =
-    Interrupts { ..interrupts::DEFAULT_HANDLERS };
+pub static _INTERRUPTS: Interrupts = Interrupts { ..interrupts::DEFAULT_HANDLERS };

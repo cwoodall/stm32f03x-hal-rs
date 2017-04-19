@@ -1,9 +1,9 @@
 //! Exceptions
-
+#![allow(unused_imports)]
 use cortex_m::asm;
-#[cfg(feature = "semihosting")]
-use cortex_m::Exception;
-use cortex_m::{Handler, StackFrame};
+pub use cortex_m::exception::DEFAULT_HANDLERS;
+pub use cortex_m::exception::Handlers as Exceptions;
+use cortex_m::exception::{StackedRegisters, Exception};
 
 /// The default exception handler
 ///
@@ -15,13 +15,10 @@ use cortex_m::{Handler, StackFrame};
 pub unsafe extern "C" fn default_handler() {
     // This is the actual exception handler. `_sf` is a pointer to the previous
     // stack frame
-    extern "C" fn handler(_sf: &StackFrame) -> ! {
+    extern "C" fn handler(_sf: &StackedRegisters) -> ! {
         hprintln!("EXCEPTION {:?} @ PC=0x{:08x}", Exception::current(), _sf.pc);
 
-        unsafe {
-            bkpt!();
-        }
-
+        asm::bkpt();
         loop {}
     }
 
@@ -31,7 +28,7 @@ pub unsafe extern "C" fn default_handler() {
           ldr r1, [r0, #20]
           b $0"
          :
-         : "i"(handler as extern "C" fn(&StackFrame) -> !) :: "volatile");
+         : "i"(handler as extern "C" fn(&StackedRegisters) -> !) :: "volatile");
 
     ::core::intrinsics::unreachable()
 }
@@ -70,45 +67,6 @@ pub unsafe extern "C" fn reset_handler() -> ! {
         asm::wfi()
     }
 }
-
-/// Exception handlers
-#[repr(C)]
-pub struct Exceptions {
-    /// Non-maskable interrupt
-    pub nmi: Handler,
-    /// All class of fault
-    pub hard_fault: Handler,
-    /// Memory management
-    pub mem_manage: Handler,
-    /// Pre-fetch fault, memory access fault
-    pub bus_fault: Handler,
-    /// Undefined instruction or illegal state
-    pub usage_fault: Handler,
-    /// Reserved spots in the vector table
-    pub _reserved0: [Reserved; 4],
-    /// System service call via SWI instruction
-    pub svcall: Handler,
-    /// Reserved spots in the vector table
-    pub _reserved1: [Reserved; 2],
-    /// Pendable request for system service
-    pub pendsv: Handler,
-    /// System tick timer
-    pub sys_tick: Handler,
-}
-
-/// Default exception handlers
-pub const DEFAULT_HANDLERS: Exceptions = Exceptions {
-    _reserved0: [Reserved::Vector; 4],
-    _reserved1: [Reserved::Vector; 2],
-    bus_fault: default_handler,
-    hard_fault: default_handler,
-    mem_manage: default_handler,
-    nmi: default_handler,
-    pendsv: default_handler,
-    svcall: default_handler,
-    sys_tick: default_handler,
-    usage_fault: default_handler,
-};
 
 /// A reserved spot in the vector table
 #[derive(Clone, Copy)]

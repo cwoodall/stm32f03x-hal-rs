@@ -18,10 +18,11 @@
 #[macro_use]
 extern crate cortex_m_semihosting;
 extern crate compiler_builtins;
-#[macro_reexport(bkpt)]
-#[macro_use]
 extern crate cortex_m;
 extern crate r0;
+extern crate stm32f0xx;
+
+pub use cortex_m::asm;
 
 #[macro_use]
 mod macros;
